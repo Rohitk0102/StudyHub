@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block title %}Browse Courses{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="bi bi-compass text-primary me-3"></i>Explore Courses
+        </h1>
+        <p class="lead text-muted">Discover amazing courses from expert instructors</p>
+    </div>
+    <div class="btn-group" role="group">
+        <input type="radio" class="btn-check" name="viewMode" id="gridMode" autocomplete="off" checked>
+        <label class="btn btn-outline-primary" for="gridMode"><i class="bi bi-grid-3x3-gap me-1"></i>Grid</label>
+        <input type="radio" class="btn-check" name="viewMode" id="listMode" autocomplete="off">
+        <label class="btn btn-outline-primary" for="listMode"><i class="bi bi-list-ul me-1"></i>List</label>
+    </div>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="card border-0 shadow-sm mb-5">
+    <div class="card-body p-4">
+        <form method="get" class="row g-3">
+            <div class="col-md-6">
+                <label for="id_q" class="form-label fw-semibold">
+                    <i class="bi bi-search me-2"></i>Search Courses
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light">
+                        <i class="bi bi-search text-muted"></i>
+                    </span>
+                    <input type="text" name="q" id="id_q" class="form-control" placeholder="Search by title, instructor, or keyword..." value="{{ query|default:'' }}">
+                </div>
+            </div>
+            <div class="col-md-4">
+                <label for="id_category" class="form-label fw-semibold">
+                    <i class="bi bi-funnel me-2"></i>Filter by Category
+                </label>
+                <select name="category" id="id_category" class="form-select">
+                    <option value="">All Categories</option>
+                    {% for category in all_categories %}
+                        <option value="{{ category.id }}" {% if selected_category|stringformat:"s" == category.id|stringformat:"s" %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button class="btn btn-primary w-100" type="submit">
+                    <i class="bi bi-search me-2"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if courses %}
+    <!-- Results Count -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h5 class="fw-bold mb-0">Found {{ courses|length }} course{{ courses|length|pluralize }}</h5>
+            {% if query %}
+                <small class="text-muted">for "{{ query }}"</small>
+            {% endif %}
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                <i class="bi bi-sort-down me-2"></i>Sort by
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="#"><i class="bi bi-calendar me-2"></i>Newest First</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-star me-2"></i>Highest Rated</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-currency-dollar me-2"></i>Price: Low to High</a></li>
+                <li><a class="dropdown-item" href="#"><i class="bi bi-people me-2"></i>Most Popular</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Grid View -->
+    <div id="coursesGrid" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+        {% for course in courses %}
+            <div class="col">
+                <div class="card h-100 border-0 shadow-sm course-card">
+                    <div class="card-header bg-transparent border-0 p-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge bg-primary-subtle text-primary">{{ course.category.name|default:"General" }}</span>
+                            <button class="btn btn-link p-0 text-muted" data-bs-toggle="tooltip" title="Add to wishlist">
+                                <i class="bi bi-heart"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex flex-column p-3 pt-0">
+                        <h5 class="card-title fw-bold mb-2 text-truncate" title="{{ course.title }}">
+                            {{ course.title }}
+                        </h5>
+                        <h6 class="card-subtitle mb-3 text-muted">
+                            <i class="bi bi-person-badge me-1"></i>
+                            {{ course.teacher.get_full_name|default:course.teacher.username }}
+                        </h6>
+                        <p class="card-text text-muted mb-3 flex-grow-1">
+                            {{ course.description|truncatechars:100 }}
+                        </p>
+                        
+                        <!-- Course Stats -->
+                        <div class="row g-2 mb-3 small text-muted">
+                            <div class="col-6">
+                                <i class="bi bi-people me-1"></i>
+                                {{ course.enrollments.count }} student{{ course.enrollments.count|pluralize }}
+                            </div>
+                            <div class="col-6">
+                                <i class="bi bi-star-fill text-warning me-1"></i>
+                                4.8 ({{ course.enrollments.count|default:"0" }})
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center mt-auto">
+                            <div class="price">
+                                <span class="h4 fw-bold text-success mb-0">${{ course.price }}</span>
+                                {% if course.price > 50 %}
+                                    <small class="text-muted text-decoration-line-through ms-2">${{ course.price|add:20 }}</small>
+                                {% endif %}
+                            </div>
+                            <a href="{% url 'course_detail' course.pk %}" class="btn btn-primary">
+                                <i class="bi bi-eye me-1"></i>View
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- List View (Initially Hidden) -->
+    <div id="coursesList" class="d-none">
+        {% for course in courses %}
+            <div class="card mb-3 border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <div class="d-flex align-items-start">
+                                <div class="course-avatar me-3">
+                                    <div class="bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                        <i class="bi bi-journal-text fs-4"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center gap-2 mb-1">
+                                        <h5 class="mb-0 fw-bold">{{ course.title }}</h5>
+                                        <span class="badge bg-primary-subtle text-primary">{{ course.category.name|default:"General" }}</span>
+                                    </div>
+                                    <p class="text-muted mb-1">
+                                        <i class="bi bi-person-badge me-1"></i>
+                                        {{ course.teacher.get_full_name|default:course.teacher.username }}
+                                    </p>
+                                    <p class="text-muted mb-2">{{ course.description|truncatechars:150 }}</p>
+                                    <div class="d-flex gap-3 small text-muted">
+                                        <span><i class="bi bi-people me-1"></i>{{ course.enrollments.count }} students</span>
+                                        <span><i class="bi bi-star-fill text-warning me-1"></i>4.8</span>
+                                        <span><i class="bi bi-clock me-1"></i>Updated {{ course.updated_at|timesince }} ago</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-md-end">
+                            <div class="d-flex flex-column align-items-md-end">
+                                <div class="price mb-2">
+                                    <span class="h4 fw-bold text-success">${{ course.price }}</span>
+                                    {% if course.price > 50 %}
+                                        <small class="text-muted text-decoration-line-through ms-2">${{ course.price|add:20 }}</small>
+                                    {% endif %}
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-secondary btn-sm" data-bs-toggle="tooltip" title="Add to wishlist">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
+                                    <a href="{% url 'course_detail' course.pk %}" class="btn btn-primary">
+                                        <i class="bi bi-eye me-1"></i>View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <!-- No Results -->
+    <div class="card border-0 bg-light">
+        <div class="card-body text-center py-5">
+            <i class="bi bi-search display-1 text-muted mb-4"></i>
+            <h4 class="fw-bold mb-3">No Courses Found</h4>
+            {% if query %}
+                <p class="text-muted mb-4">We couldn't find any courses matching "{{ query }}". Try searching with different keywords.</p>
+            {% else %}
+                <p class="text-muted mb-4">No courses are available at the moment. Check back later for new content!</p>
+            {% endif %}
+            <div class="d-flex gap-2 justify-content-center">
+                <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i>View All Courses
+                </a>
+                <a href="{% url 'home' %}" class="btn btn-primary">
+                    <i class="bi bi-house me-2"></i>Back to Home
+                </a>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+<style>
+.course-card {
+    transition: all 0.3s ease;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.course-avatar {
+    transition: transform 0.2s ease;
+}
+
+.course-avatar:hover {
+    transform: scale(1.05);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // View mode toggle
+    const gridModeBtn = document.getElementById('gridMode');
+    const listModeBtn = document.getElementById('listMode');
+    const coursesGrid = document.getElementById('coursesGrid');
+    const coursesList = document.getElementById('coursesList');
+    
+    if (gridModeBtn && listModeBtn && coursesGrid && coursesList) {
+        listModeBtn.addEventListener('change', function() {
+            if (this.checked) {
+                coursesGrid.classList.add('d-none');
+                coursesList.classList.remove('d-none');
+            }
+        });
+        
+        gridModeBtn.addEventListener('change', function() {
+            if (this.checked) {
+                coursesList.classList.add('d-none');
+                coursesGrid.classList.remove('d-none');
+            }
+        });
+    }
+    
+    // Initialize tooltips
+    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+{% endblock %}

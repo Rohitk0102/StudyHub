@@ -1,0 +1,315 @@
+{% extends 'base.html' %}
+{% block title %}Students in {{ course.title }}{% endblock %}
+{% block content %}
+<!-- Course Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-0 bg-gradient-primary text-white">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 me-4">
+                        <div class="bg-white bg-opacity-20 rounded-circle p-3">
+                            <i class="bi bi-people display-6 text-white"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h2 class="mb-2 fw-bold">{{ course.title }}</h2>
+                        <p class="mb-3 opacity-90">Manage and view your enrolled students</p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <span class="badge bg-white bg-opacity-20 px-3 py-2">
+                                <i class="bi bi-people me-1"></i>{{ enrolled_students.count }} Enrolled
+                            </span>
+                            <span class="badge bg-white bg-opacity-20 px-3 py-2">
+                                <i class="bi bi-currency-dollar me-1"></i>${{ course.price }}
+                            </span>
+                            <span class="badge bg-white bg-opacity-20 px-3 py-2">
+                                <i class="bi bi-calendar me-1"></i>{{ course.created_at|date:"M Y" }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0">
+                        <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-light">
+                            <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4 g-3">
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 bg-gradient-success text-white h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-people display-4 mb-3 opacity-75"></i>
+                <h3 class="fw-bold mb-1">{{ enrolled_students.count }}</h3>
+                <p class="mb-0 opacity-90">Total Students</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 bg-gradient-info text-white h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-currency-dollar display-4 mb-3 opacity-75"></i>
+                <h3 class="fw-bold mb-1">${{ course.price|floatformat:0 }}</h3>
+                <p class="mb-0 opacity-90">Course Price</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 bg-gradient-warning text-white h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-calendar-event display-4 mb-3 opacity-75"></i>
+                <h3 class="fw-bold mb-1">{{ enrolled_students|length }}</h3>
+                <p class="mb-0 opacity-90">This Month</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card border-0 bg-gradient-secondary text-white h-100">
+            <div class="card-body text-center p-4">
+                <i class="bi bi-star display-4 mb-3 opacity-75"></i>
+                <h3 class="fw-bold mb-1">4.8</h3>
+                <p class="mb-0 opacity-90">Avg Rating</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Students Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold">
+                    <i class="bi bi-people me-2 text-primary"></i>Enrolled Students
+                </h5>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary btn-sm" onclick="exportStudents()">
+                        <i class="bi bi-download me-1"></i>Export List
+                    </button>
+                    <div class="input-group input-group-sm" style="width: 250px;">
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input type="text" class="form-control" placeholder="Search students..." id="studentSearch">
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if enrolled_students %}
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4 border-0">
+                                        <i class="bi bi-hash me-1"></i>#
+                                    </th>
+                                    <th class="border-0">
+                                        <i class="bi bi-person me-1"></i>Student
+                                    </th>
+                                    <th class="border-0">
+                                        <i class="bi bi-envelope me-1"></i>Email
+                                    </th>
+                                    <th class="border-0">
+                                        <i class="bi bi-calendar me-1"></i>Enrolled On
+                                    </th>
+                                    <th class="border-0">
+                                        <i class="bi bi-clock me-1"></i>Time
+                                    </th>
+                                    <th class="border-0 pe-4">
+                                        <i class="bi bi-gear me-1"></i>Actions
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for enrollment in enrolled_students %}
+                                    <tr class="student-row">
+                                        <td class="ps-4 py-3">
+                                            <span class="badge bg-primary rounded-pill">{{ forloop.counter }}</span>
+                                        </td>
+                                        <td class="py-3">
+                                            <div class="d-flex align-items-center">
+                                                <div class="flex-shrink-0 me-3">
+                                                    <div class="bg-gradient-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                                         style="width: 40px; height: 40px; font-weight: bold;">
+                                                        {{ enrollment.student.username|first|upper }}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold">
+                                                        {{ enrollment.student.username }}
+                                                    </div>
+                                                    <small class="text-muted">
+                                                        Student ID: #{{ enrollment.student.id }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="py-3">
+                                            <div class="text-muted">{{ enrollment.student.email }}</div>
+                                        </td>
+                                        <td class="py-3">
+                                            <div class="fw-semibold">{{ enrollment.enrollment_date|date:"M d, Y" }}</div>
+                                            <small class="text-muted">{{ enrollment.enrollment_date|timesince }} ago</small>
+                                        </td>
+                                        <td class="py-3">
+                                            <span class="badge bg-light text-dark">
+                                                {{ enrollment.enrollment_date|date:"H:i" }}
+                                            </span>
+                                        </td>
+                                        <td class="py-3 pe-4">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="mailto:{{ enrollment.student.email }}" 
+                                                   class="btn btn-outline-primary" 
+                                                   title="Send Email">
+                                                    <i class="bi bi-envelope"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-outline-info" 
+                                                        title="View Profile" onclick="viewProfile({{ enrollment.student.id }})">
+                                                    <i class="bi bi-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-danger" 
+                                                        title="Remove Student" onclick="removeStudent({{ enrollment.id }})">
+                                                    <i class="bi bi-person-x"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <!-- Empty State -->
+                    <div class="text-center py-5">
+                        <div class="empty-state">
+                            <i class="bi bi-people display-1 text-muted mb-4 opacity-50"></i>
+                            <h4 class="fw-bold mb-3">No Students Enrolled Yet</h4>
+                            <p class="text-muted mb-4 lead">Your course is ready! Students will appear here once they enroll.</p>
+                            <div class="d-flex justify-content-center gap-3">
+                                <a href="{% url 'course_content_manage' course.id %}" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle me-2"></i>Add Course Content
+                                </a>
+                                <button class="btn btn-outline-secondary" onclick="shareCourse()">
+                                    <i class="bi bi-share me-2"></i>Share Course
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Course Analytics Card -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card border-0 bg-light">
+            <div class="card-body p-4">
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-graph-up text-success me-2"></i>Quick Analytics
+                </h6>
+                <div class="row g-3 text-center">
+                    <div class="col-md-3">
+                        <div class="fw-bold text-primary">{{ enrolled_students.count }}</div>
+                        <small class="text-muted">Total Students</small>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fw-bold text-success">${{ course.price|floatformat:0 }}</div>
+                        <small class="text-muted">Course Price</small>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fw-bold text-info">{{ course.content_set.count }}</div>
+                        <small class="text-muted">Content Items</small>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="fw-bold text-warning">{{ course.created_at|timesince }}</div>
+                        <small class="text-muted">Course Age</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.student-row:hover {
+    background-color: #f8f9fa;
+}
+
+.empty-state i {
+    opacity: 0.3;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(45deg, #198754, #20c997);
+}
+
+.bg-gradient-info {
+    background: linear-gradient(45deg, #0dcaf0, #0d6efd);
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(45deg, #ffc107, #fd7e14);
+}
+
+.bg-gradient-secondary {
+    background: linear-gradient(45deg, #6c757d, #495057);
+}
+
+.table th {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.875rem;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+}
+</style>
+
+<script>
+// Search functionality
+document.getElementById('studentSearch')?.addEventListener('input', function(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('.student-row');
+    
+    rows.forEach(row => {
+        const studentName = row.querySelector('.fw-semibold').textContent.toLowerCase();
+        const studentEmail = row.querySelectorAll('.text-muted')[0].textContent.toLowerCase();
+        
+        if (studentName.includes(searchTerm) || studentEmail.includes(searchTerm)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+
+function viewProfile(studentId) {
+    // Implement profile view functionality
+    alert('Profile view feature coming soon!');
+}
+
+function removeStudent(enrollmentId) {
+    if (confirm('Are you sure you want to remove this student from the course?')) {
+        // Implement removal functionality
+        alert('Remove functionality coming soon!');
+    }
+}
+
+function exportStudents() {
+    // Implement export functionality
+    alert('Export feature coming soon!');
+}
+
+function shareCourse() {
+    // Implement course sharing functionality
+    alert('Share course feature coming soon!');
+}
+</script>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block title %}Sign Up{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6 col-md-8">
+        <div class="card shadow-lg border-0">
+            <div class="card-header text-center py-4">
+                <i class="bi bi-person-plus display-4 mb-3 text-success"></i>
+                                        <h3 class="text-center mb-4">Join StudyHub</h3>
+                <p class="text-muted mb-0">Create your account to start learning or teaching</p>
+            </div>
+            <div class="card-body p-5">
+                <form method="post" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-semibold">
+                                {% if field.name == 'username' %}
+                                    <i class="bi bi-person me-2"></i>
+                                {% elif field.name == 'email' %}
+                                    <i class="bi bi-envelope me-2"></i>
+                                {% elif field.name == 'first_name' %}
+                                    <i class="bi bi-person-badge me-2"></i>
+                                {% elif field.name == 'last_name' %}
+                                    <i class="bi bi-person-badge me-2"></i>
+                                {% elif 'password' in field.name %}
+                                    <i class="bi bi-key me-2"></i>
+                                {% elif field.name == 'user_type' %}
+                                    <i class="bi bi-person-gear me-2"></i>
+                                {% endif %}
+                                {{ field.label }}
+                            </label>
+                            
+                            {% if field.name == 'user_type' %}
+                                <div class="row g-3">
+                                    {% for radio in field %}
+                                        <div class="col-6">
+                                            <input type="radio" class="btn-check" name="{{ field.html_name }}" id="{{ radio.id_for_label }}" value="{{ radio.data.value }}" {% if radio.data.selected %}checked{% endif %} autocomplete="off">
+                                            <label class="btn btn-outline-primary w-100 py-3" for="{{ radio.id_for_label }}">
+                                                {% if radio.data.value == 'student' %}
+                                                    <i class="bi bi-person-graduation d-block mb-2 fs-3"></i>
+                                                    <div class="fw-bold">Student</div>
+                                                    <small class="text-muted">Learn & Grow</small>
+                                                {% else %}
+                                                    <i class="bi bi-person-badge d-block mb-2 fs-3"></i>
+                                                    <div class="fw-bold">Teacher</div>
+                                                    <small class="text-muted">Teach & Inspire</small>
+                                                {% endif %}
+                                            </label>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        {% if field.name == 'username' %}
+                                            <i class="bi bi-person-circle text-muted"></i>
+                                        {% elif field.name == 'email' %}
+                                            <i class="bi bi-envelope text-muted"></i>
+                                        {% elif field.name == 'first_name' or field.name == 'last_name' %}
+                                            <i class="bi bi-person text-muted"></i>
+                                        {% elif 'password' in field.name %}
+                                            <i class="bi bi-lock text-muted"></i>
+                                        {% endif %}
+                                    </span>
+                                    {{ field|add_class:"form-control border-start-0" }}
+                                </div>
+                            {% endif %}
+                            
+                            {% if field.help_text %}
+                                <div class="form-text text-muted small mt-2">
+                                    <i class="bi bi-info-circle me-1"></i>{{ field.help_text }}
+                                </div>
+                            {% endif %}
+                            
+                            {% for error in field.errors %}
+                                <div class="invalid-feedback d-block mt-2">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>{{ error }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                    
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <div>
+                                {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="d-grid gap-3 mb-4">
+                        <button type="submit" class="btn btn-success btn-lg py-3">
+                            <i class="bi bi-person-plus me-2"></i>Create My Account
+                        </button>
+                    </div>
+                    
+                    <div class="text-center">
+                        <div class="row">
+                            <div class="col">
+                                <hr>
+                            </div>
+                            <div class="col-auto">
+                                <span class="text-muted small">Already have an account?</span>
+                            </div>
+                            <div class="col">
+                                <hr>
+                            </div>
+                        </div>
+                        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg mt-3 w-100">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Sign In Instead
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Terms & Privacy -->
+        <div class="text-center mt-4">
+            <small class="text-muted">
+                By signing up, you agree to our 
+                <a href="#terms" class="text-decoration-none">Terms of Service</a> and 
+                <a href="#privacy" class="text-decoration-none">Privacy Policy</a>
+            </small>
+        </div>
+    </div>
+</div>
+{% endblock %}

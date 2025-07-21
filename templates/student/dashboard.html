@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+{% block title %}Student Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="bi bi-person-graduation text-primary me-3"></i>Welcome Back!
+        </h1>
+        <p class="lead text-muted">Hello {{ user.username }}, continue your learning journey</p>
+    </div>
+    <div class="d-flex gap-3">
+        <a href="{% url 'course_list' %}" class="btn btn-primary">
+            <i class="bi bi-search me-2"></i>Browse Courses
+        </a>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                <i class="bi bi-book-fill display-4 mb-3"></i>
+                <h3 class="fw-bold">{{ enrolled_courses|length }}</h3>
+                <p class="mb-0">Enrolled Courses</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #48bb78, #38a169); color: white;">
+                <i class="bi bi-trophy-fill display-4 mb-3"></i>
+                <h3 class="fw-bold">{{ enrolled_courses|length }}</h3>
+                <p class="mb-0">Completed</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #ed8936, #dd6b20); color: white;">
+                <i class="bi bi-clock-fill display-4 mb-3"></i>
+                <h3 class="fw-bold">0</h3>
+                <p class="mb-0">In Progress</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #4299e1, #3182ce); color: white;">
+                <i class="bi bi-star-fill display-4 mb-3"></i>
+                <h3 class="fw-bold">4.8</h3>
+                <p class="mb-0">Avg. Rating</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-journal-bookmark me-2 text-primary"></i>My Learning
+            </h3>
+            {% if enrolled_courses %}
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="viewType" id="gridView" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="gridView"><i class="bi bi-grid-3x3-gap"></i></label>
+                    <input type="radio" class="btn-check" name="viewType" id="listView" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="listView"><i class="bi bi-list-ul"></i></label>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if enrolled_courses %}
+            <div id="coursesGrid" class="row g-4">
+                {% for enrollment in enrolled_courses %}
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="course-icon me-3">
+                                        <i class="bi bi-play-circle-fill fs-2 text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-2 fw-bold">
+                                            <a href="{% url 'course_content_access' enrollment.course.pk %}" class="text-decoration-none text-dark">
+                                                {{ enrollment.course.title }}
+                                            </a>
+                                        </h5>
+                                        <p class="text-muted small mb-2">
+                                            <i class="bi bi-person-badge me-1"></i>
+                                            {{ enrollment.course.teacher.get_full_name|default:enrollment.course.teacher.username }}
+                                        </p>
+                                        <p class="card-text small text-muted mb-3">
+                                            {{ enrollment.course.description|truncatechars:100 }}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Progress Bar -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between small text-muted mb-1">
+                                        <span>Progress</span>
+                                        <span>{{ enrollment.progress|default:"0" }}%</span>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ enrollment.progress|default:"0" }}%"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        Enrolled: {{ enrollment.enrollment_date|date:"M d, Y" }}
+                                    </small>
+                                    <a href="{% url 'course_content_access' enrollment.course.pk %}" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-play-fill me-1"></i>Continue
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- List View (Initially Hidden) -->
+            <div id="coursesList" class="d-none">
+                {% for enrollment in enrolled_courses %}
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-play-circle-fill fs-2 text-primary me-3"></i>
+                                        <div>
+                                            <h5 class="mb-1 fw-bold">
+                                                <a href="{% url 'course_content_access' enrollment.course.pk %}" class="text-decoration-none text-dark">
+                                                    {{ enrollment.course.title }}
+                                                </a>
+                                            </h5>
+                                            <p class="text-muted mb-1">
+                                                <i class="bi bi-person-badge me-1"></i>
+                                                {{ enrollment.course.teacher.get_full_name|default:enrollment.course.teacher.username }}
+                                            </p>
+                                            <small class="text-muted">Enrolled: {{ enrollment.enrollment_date|date:"M d, Y" }}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <div class="mb-2">
+                                        <small class="text-muted">Progress: {{ enrollment.progress|default:"0" }}%</small>
+                                        <div class="progress mt-1" style="height: 6px;">
+                                            <div class="progress-bar" role="progressbar" style="width: {{ enrollment.progress|default:"0" }}%"></div>
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'course_content_access' enrollment.course.pk %}" class="btn btn-primary">
+                                        <i class="bi bi-play-fill me-1"></i>Continue Learning
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card border-0 bg-light">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-journal-x display-1 text-muted mb-4"></i>
+                    <h4 class="fw-bold mb-3">No Courses Yet!</h4>
+                    <p class="text-muted mb-4">You haven't enrolled in any courses. Discover exciting new topics and start your learning journey!</p>
+                    <a href="{% url 'course_list' %}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-search me-2"></i>Browse Available Courses
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-lightning me-2 text-warning"></i>Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'course_list' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-search me-2"></i>Browse New Courses
+                    </a>
+                    <a href="#" class="btn btn-outline-info">
+                        <i class="bi bi-bookmark-heart me-2"></i>View Wishlist
+                    </a>
+                    <a href="#" class="btn btn-outline-success">
+                        <i class="bi bi-trophy me-2"></i>My Achievements
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-clock-history me-2 text-info"></i>Recent Activity
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% if enrolled_courses %}
+                        {% for enrollment in enrolled_courses|slice:":3" %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-primary"></div>
+                                <div class="timeline-content">
+                                    <h6 class="small fw-bold mb-1">Course Enrolled</h6>
+                                    <p class="small text-muted mb-1">{{ enrollment.course.title }}</p>
+                                    <small class="text-muted">{{ enrollment.enrollment_date|timesince }} ago</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small mb-0">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 2rem;
+    padding-bottom: 1rem;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 1.5rem;
+    height: calc(100% - 0.5rem);
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+
+.course-icon:hover i {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gridViewBtn = document.getElementById('gridView');
+    const listViewBtn = document.getElementById('listView');
+    const coursesGrid = document.getElementById('coursesGrid');
+    const coursesList = document.getElementById('coursesList');
+    
+    if (gridViewBtn && listViewBtn && coursesGrid && coursesList) {
+        listViewBtn.addEventListener('change', function() {
+            if (this.checked) {
+                coursesGrid.classList.add('d-none');
+                coursesList.classList.remove('d-none');
+            }
+        });
+        
+        gridViewBtn.addEventListener('change', function() {
+            if (this.checked) {
+                coursesList.classList.add('d-none');
+                coursesGrid.classList.remove('d-none');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

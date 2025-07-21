@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <h1 class="display-5 fw-bold mb-2">
+            <i class="bi bi-person-badge text-success me-3"></i>Teacher Portal
+        </h1>
+        <p class="lead text-muted">Hello {{ user.username }}, manage your courses and inspire learners</p>
+    </div>
+    <a href="{% url 'course_create' %}" class="btn btn-success btn-lg">
+        <i class="bi bi-plus-circle me-2"></i>Create New Course
+    </a>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-5">
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
+                <i class="bi bi-journal-text display-4 mb-3"></i>
+                <h3 class="fw-bold">{{ courses|length }}</h3>
+                <p class="mb-0">Total Courses</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #48bb78, #38a169); color: white;">
+                <i class="bi bi-people-fill display-4 mb-3"></i>
+                <h3 class="fw-bold">
+                    {% if courses %}
+                        {% for course in courses %}
+                            {{ course.enrollments.count|add:0 }}
+                        {% endfor %}
+                    {% else %}
+                        0
+                    {% endif %}
+                </h3>
+                <p class="mb-0">Total Students</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #ed8936, #dd6b20); color: white;">
+                <i class="bi bi-currency-dollar display-4 mb-3"></i>
+                <h3 class="fw-bold">
+                    ${% if courses %}
+                        {% for course in courses %}
+                            {{ course.price|floatformat:0|add:0 }}
+                        {% endfor %}
+                    {% else %}
+                        0
+                    {% endif %}
+                </h3>
+                <p class="mb-0">Total Revenue</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6">
+        <div class="card border-0 bg-gradient">
+            <div class="card-body text-center py-4" style="background: linear-gradient(135deg, #4299e1, #3182ce); color: white;">
+                <i class="bi bi-star-fill display-4 mb-3"></i>
+                <h3 class="fw-bold">4.9</h3>
+                <p class="mb-0">Avg. Rating</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold mb-0">
+                <i class="bi bi-book-half me-2 text-primary"></i>My Courses
+            </h3>
+            {% if courses %}
+                <div class="btn-group" role="group">
+                    <input type="radio" class="btn-check" name="viewType" id="gridView" autocomplete="off" checked>
+                    <label class="btn btn-outline-primary" for="gridView"><i class="bi bi-grid-3x3-gap"></i></label>
+                    <input type="radio" class="btn-check" name="viewType" id="listView" autocomplete="off">
+                    <label class="btn btn-outline-primary" for="listView"><i class="bi bi-list-ul"></i></label>
+                </div>
+            {% endif %}
+        </div>
+
+        {% if courses %}
+            <!-- Grid View -->
+            <div id="coursesGrid" class="row g-4">
+                {% for course in courses %}
+                    <div class="col-md-6">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body">
+                                <div class="d-flex align-items-start mb-3">
+                                    <div class="course-icon me-3">
+                                        <i class="bi bi-journal-bookmark-fill fs-2 text-success"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h5 class="card-title mb-2 fw-bold">{{ course.title }}</h5>
+                                        <p class="card-text small text-muted mb-3">
+                                            {{ course.description|truncatechars:100 }}
+                                        </p>
+                                        <div class="row text-center mb-3">
+                                            <div class="col-6">
+                                                <div class="border-end">
+                                                    <h6 class="fw-bold text-primary mb-0">${{ course.price }}</h6>
+                                                    <small class="text-muted">Price</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <h6 class="fw-bold text-info mb-0">{{ course.enrollments.count }}</h6>
+                                                <small class="text-muted">Students</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar3 me-1"></i>
+                                        {{ course.created_at|date:"M d, Y" }}
+                                    </small>
+                                    <div class="dropdown">
+                                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="{% url 'course_update' course.pk %}"><i class="bi bi-pencil me-2"></i>Edit Course</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'course_content_manage' course.pk %}"><i class="bi bi-gear me-2"></i>Manage Content</a></li>
+                                            <li><a class="dropdown-item" href="{% url 'course_students_view' course.pk %}"><i class="bi bi-people me-2"></i>View Students</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item text-danger" href="{% url 'course_delete' course.pk %}"><i class="bi bi-trash me-2"></i>Delete</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            <!-- List View (Initially Hidden) -->
+            <div id="coursesList" class="d-none">
+                {% for course in courses %}
+                    <div class="card mb-3 border-0 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-journal-bookmark-fill fs-2 text-success me-3"></i>
+                                        <div>
+                                            <h5 class="mb-1 fw-bold">{{ course.title }}</h5>
+                                            <p class="text-muted mb-1">{{ course.description|truncatechars:80 }}</p>
+                                            <div class="d-flex gap-3">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-currency-dollar me-1"></i>${{ course.price }}
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-people me-1"></i>{{ course.enrollments.count }} students
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="bi bi-calendar3 me-1"></i>{{ course.created_at|date:"M d, Y" }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <div class="d-flex gap-2 justify-content-md-end">
+                                        <a href="{% url 'course_update' course.pk %}" class="btn btn-outline-info btn-sm">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'course_content_manage' course.pk %}" class="btn btn-outline-secondary btn-sm">
+                                            <i class="bi bi-gear"></i>
+                                        </a>
+                                        <a href="{% url 'course_students_view' course.pk %}" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-people"></i>
+                                        </a>
+                                        <a href="{% url 'course_delete' course.pk %}" class="btn btn-outline-danger btn-sm">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="card border-0 bg-light">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-journal-plus display-1 text-muted mb-4"></i>
+                    <h4 class="fw-bold mb-3">No Courses Yet!</h4>
+                    <p class="text-muted mb-4">You haven't created any courses. Start sharing your knowledge by creating your first course today!</p>
+                    <a href="{% url 'course_create' %}" class="btn btn-success btn-lg">
+                        <i class="bi bi-plus-circle me-2"></i>Create Your First Course
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <!-- Quick Actions -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-lightning me-2 text-warning"></i>Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'course_create' %}" class="btn btn-success">
+                        <i class="bi bi-plus-circle me-2"></i>Create New Course
+                    </a>
+                    <a href="#" class="btn btn-outline-info">
+                        <i class="bi bi-graph-up me-2"></i>View Analytics
+                    </a>
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="bi bi-envelope me-2"></i>Message Students
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-clock-history me-2 text-info"></i>Recent Activity
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    {% if courses %}
+                        {% for course in courses|slice:":3" %}
+                            <div class="timeline-item">
+                                <div class="timeline-marker bg-success"></div>
+                                <div class="timeline-content">
+                                    <h6 class="small fw-bold mb-1">Course Created</h6>
+                                    <p class="small text-muted mb-1">{{ course.title }}</p>
+                                    <small class="text-muted">{{ course.created_at|timesince }} ago</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small mb-0">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tips -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-transparent border-0 pb-0">
+                <h6 class="fw-bold mb-0">
+                    <i class="bi bi-lightbulb me-2 text-warning"></i>Tips for Success
+                </h6>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Keep course content updated</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Engage with your students</li>
+                    <li class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Use multimedia content</li>
+                    <li><i class="bi bi-check-circle text-success me-2"></i>Collect feedback regularly</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.timeline {
+    position: relative;
+}
+
+.timeline-item {
+    position: relative;
+    padding-left: 2rem;
+    padding-bottom: 1rem;
+}
+
+.timeline-item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 0.5rem;
+    top: 1.5rem;
+    height: calc(100% - 0.5rem);
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: 0;
+    top: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+
+.course-icon:hover i {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const gridViewBtn = document.getElementById('gridView');
+    const listViewBtn = document.getElementById('listView');
+    const coursesGrid = document.getElementById('coursesGrid');
+    const coursesList = document.getElementById('coursesList');
+    
+    if (gridViewBtn && listViewBtn && coursesGrid && coursesList) {
+        listViewBtn.addEventListener('change', function() {
+            if (this.checked) {
+                coursesGrid.classList.add('d-none');
+                coursesList.classList.remove('d-none');
+            }
+        });
+        
+        gridViewBtn.addEventListener('change', function() {
+            if (this.checked) {
+                coursesList.classList.add('d-none');
+                coursesGrid.classList.remove('d-none');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% block title %}{{ course.title }}{% endblock %}
+{% block content %}
+<div class="row g-5">
+    <div class="col-lg-8">
+        <!-- Course Hero Section -->
+        <div class="card border-0 shadow-lg mb-5">
+            <div class="course-hero position-relative overflow-hidden" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8)), url('data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 1000 1000\"><rect fill=\"%23f8f9fa\" width=\"1000\" height=\"1000\"/><g fill-opacity=\".1\"><polygon fill=\"%23000\" points=\"957.8,543.8 407.1,72.9 407.1,543.8\"/></g></svg>'); height: 300px;">
+                <div class="card-body h-100 d-flex flex-column justify-content-center text-white p-5">
+                    <div class="mb-3">
+                        <span class="badge bg-warning fs-6 mb-2">{{ course.category.name|default:"General Course" }}</span>
+                    </div>
+                    <h1 class="display-5 fw-bold mb-3">{{ course.title }}</h1>
+                    <p class="lead mb-4">{{ course.description|truncatechars:120 }}</p>
+                    <div class="d-flex align-items-center gap-4">
+                        <div class="instructor-info d-flex align-items-center">
+                            <div class="instructor-avatar me-3">
+                                <div class="bg-white text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="bi bi-person-fill fs-4"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold">{{ course.teacher.get_full_name|default:course.teacher.username }}</h6>
+                                <small class="opacity-75">Course Instructor</small>
+                            </div>
+                        </div>
+                        <div class="course-rating d-flex align-items-center">
+                            <div class="stars me-2">
+                                {% for i in "12345" %}
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                {% endfor %}
+                            </div>
+                            <span class="fw-bold">4.9</span>
+                            <small class="opacity-75 ms-1">({{ course.enrollments.count }} reviews)</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Content -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-5">
+                <h3 class="fw-bold mb-4">
+                    <i class="bi bi-book-half me-2 text-primary"></i>Course Description
+                </h3>
+                <div class="course-description">
+                    <p class="lead text-muted mb-4">{{ course.description|linebreaksbr }}</p>
+                    
+                    <!-- What you'll learn section -->
+                    <div class="learning-outcomes mb-5">
+                        <h5 class="fw-bold mb-3">What you'll learn</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                                    <span>Master the fundamentals covered in this course</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                                    <span>Apply practical skills to real-world projects</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                                    <span>Build a portfolio of work you can showcase</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start">
+                                    <i class="bi bi-check-circle-fill text-success me-3 mt-1"></i>
+                                    <span>Connect with a community of learners</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Stats -->
+        <div class="row g-4 mb-4">
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card text-center p-3 bg-primary-subtle rounded-3">
+                    <i class="bi bi-people-fill fs-2 text-primary mb-2"></i>
+                    <h5 class="fw-bold mb-0">{{ course.enrollments.count }}</h5>
+                    <small class="text-muted">Students</small>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card text-center p-3 bg-success-subtle rounded-3">
+                    <i class="bi bi-star-fill fs-2 text-success mb-2"></i>
+                    <h5 class="fw-bold mb-0">4.9</h5>
+                    <small class="text-muted">Rating</small>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card text-center p-3 bg-info-subtle rounded-3">
+                    <i class="bi bi-clock-fill fs-2 text-info mb-2"></i>
+                    <h5 class="fw-bold mb-0">12h</h5>
+                    <small class="text-muted">Duration</small>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-3">
+                <div class="stat-card text-center p-3 bg-warning-subtle rounded-3">
+                    <i class="bi bi-trophy-fill fs-2 text-warning mb-2"></i>
+                    <h5 class="fw-bold mb-0">Yes</h5>
+                    <small class="text-muted">Certificate</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="col-lg-4">
+        <div class="sticky-top" style="top: 100px;">
+            <!-- Purchase Card -->
+            <div class="card border-0 shadow-lg mb-4">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="price-display mb-3">
+                            <span class="h2 fw-bold text-success">${{ course.price }}</span>
+                            {% if course.price > 50 %}
+                                <span class="text-muted text-decoration-line-through ms-2 fs-5">${{ course.price|add:25 }}</span>
+                            {% endif %}
+                        </div>
+                        {% if course.price > 50 %}
+                            <div class="discount-badge">
+                                <span class="badge bg-danger fs-6">Limited Time Offer!</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if is_enrolled %}
+                        <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+                            <i class="bi bi-check-circle-fill me-3 fs-4"></i>
+                            <div>
+                                <strong>You're enrolled!</strong><br>
+                                <small>Access your course content now</small>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <a href="{% url 'course_content_access' course.pk %}" class="btn btn-success btn-lg">
+                                <i class="bi bi-play-circle-fill me-2"></i>Go to Course
+                            </a>
+                        </div>
+                    {% else %}
+                        <form method="post" action="{% url 'course_purchase' course.pk %}">
+                            {% csrf_token %}
+                            <div class="d-grid gap-3 mb-4">
+                                <button type="submit" name="simulate_submit" class="btn btn-success btn-lg">
+                                    <i class="bi bi-cart-plus me-2"></i>Enroll Now
+                                </button>
+                                <button type="submit" name="paypal_submit" class="btn btn-primary btn-lg">
+                                    <i class="bi bi-paypal me-2"></i>Pay with PayPal
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Additional Actions -->
+                        <div class="d-grid gap-2 mb-4">
+                            <button class="btn btn-outline-danger">
+                                <i class="bi bi-heart me-2"></i>Add to Wishlist
+                            </button>
+                            <button class="btn btn-outline-info">
+                                <i class="bi bi-gift me-2"></i>Gift This Course
+                            </button>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Money-back guarantee -->
+                    <div class="guarantee-badge text-center p-3 bg-light rounded-3">
+                        <i class="bi bi-shield-check text-success fs-4 mb-2 d-block"></i>
+                        <strong class="small">30-Day Money-Back Guarantee</strong>
+                        <div class="small text-muted">Full refund if you're not satisfied</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Course Info -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-0 pb-0">
+                    <h6 class="fw-bold mb-0">
+                        <i class="bi bi-info-circle me-2 text-info"></i>Course Information
+                    </h6>
+                </div>
+                <div class="card-body pt-3">
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-person-badge me-3 text-muted"></i>
+                            <div>
+                                <strong>Instructor</strong><br>
+                                <small class="text-muted">{{ course.teacher.get_full_name|default:course.teacher.username }}</small>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-calendar3 me-3 text-muted"></i>
+                            <div>
+                                <strong>Created</strong><br>
+                                <small class="text-muted">{{ course.created_at|date:"F d, Y" }}</small>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-arrow-clockwise me-3 text-muted"></i>
+                            <div>
+                                <strong>Last Updated</strong><br>
+                                <small class="text-muted">{{ course.updated_at|date:"F d, Y" }}</small>
+                            </div>
+                        </li>
+                        <li class="mb-3 d-flex align-items-center">
+                            <i class="bi bi-globe me-3 text-muted"></i>
+                            <div>
+                                <strong>Language</strong><br>
+                                <small class="text-muted">English</small>
+                            </div>
+                        </li>
+                        <li class="d-flex align-items-center">
+                            <i class="bi bi-award me-3 text-muted"></i>
+                            <div>
+                                <strong>Certificate</strong><br>
+                                <small class="text-muted">Yes, upon completion</small>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Back Button -->
+<div class="mt-5 pt-4 border-top">
+    <a href="{% url 'course_list' %}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Back to All Courses
+    </a>
+</div>
+
+<style>
+.course-hero {
+    border-radius: 20px 20px 0 0;
+}
+
+.stat-card {
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.instructor-avatar,
+.stars {
+    transition: transform 0.2s ease;
+}
+
+.instructor-avatar:hover {
+    transform: scale(1.05);
+}
+
+.price-display {
+    position: relative;
+}
+
+.guarantee-badge {
+    transition: all 0.3s ease;
+}
+
+.guarantee-badge:hover {
+    background-color: #e8f5e8 !important;
+}
+</style>
+{% endblock %}
