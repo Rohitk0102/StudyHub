@@ -10,6 +10,13 @@ A Django-based e-learning platform for teachers to create courses and students t
 - **Modern UI**: Bootstrap 5 responsive design
 - **Admin Panel**: Full administrative control
 
+##Project Screenshots
+<img width="1710" height="1112" alt="1" src="https://github.com/user-attachments/assets/3fcdeba6-c04c-4b95-a83b-2d666e4dbdfe" />
+<img width="1710" height="1112" alt="2" src="https://github.com/user-attachments/assets/d8c76fa7-752d-4102-a070-5760178c4205" />
+<img width="1710" height="1112" alt="3" src="https://github.com/user-attachments/assets/7bba37bc-e4a6-4a31-a031-b6269e4cb6b7" />
+<img width="1710" height="1112" alt="4" src="https://github.com/user-attachments/assets/5e839032-c8e2-48d4-9e00-4d32cfb18daf" />
+
+
 ##  Requirements
 
 - Python 3.8+
