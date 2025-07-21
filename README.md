@@ -2,7 +2,7 @@
 
 A Django-based e-learning platform for teachers to create courses and students to enroll online.
 
-## 🚀 Features
+##  Features
 
 - **Course Management**: Create and manage courses
 - **Student Enrollment**: Browse and enroll in courses  
@@ -10,13 +10,13 @@ A Django-based e-learning platform for teachers to create courses and students t
 - **Modern UI**: Bootstrap 5 responsive design
 - **Admin Panel**: Full administrative control
 
-## 📋 Requirements
+##  Requirements
 
 - Python 3.8+
 - Django
 - Modern web browser
 
-## 🛠️ Quick Setup
+##  Quick Setup
 
 ### 1. Install & Setup
 ```bash
@@ -36,7 +36,7 @@ python3 manage.py runserver
 
 Visit: **http://127.0.0.1:8000/**
 
-## 🔑 Login Credentials
+##  Login Credentials
 
 ### Admin Account
 - **Username:** `admin`
@@ -44,7 +44,7 @@ Visit: **http://127.0.0.1:8000/**
 - **Email:** `admin@gmail.com`
 
 
-## 🔐 OTP Authentication
+##  OTP Authentication
 
 **Important:** This app uses 2-factor authentication. When you login:
 
@@ -56,18 +56,18 @@ Visit: **http://127.0.0.1:8000/**
 ### What you'll see in terminal:
 ```
 ============================================================
-🔐                OTP GENERATED FOR LOGIN                 🔐
+                 OTP GENERATED FOR LOGIN                 
 ============================================================
-👤 USER EMAIL: admin@gmail.com
-🔢 6-DIGIT OTP: 123456
-⏰ EXPIRES IN: 5 minutes
+  USER EMAIL: admin@gmail.com
+  6-DIGIT OTP: 123456
+  EXPIRES IN: 5 minutes
 ============================================================
-✅ OTP email sent successfully to admin@gmail.com
+  OTP email sent successfully to admin@gmail.com
 ```
 
 **Note:** The OTP appears in the terminal, NOT in email (for development).
 
-## 🎯 Quick Start
+##  Quick Start
 
 1. **Start server:** `python manage.py runserver`
 2. **Go to:** http://127.0.0.1:8000/login/
@@ -76,7 +76,7 @@ Visit: **http://127.0.0.1:8000/**
 5. **Enter OTP** in browser
 6. **Explore the platform!**
 
-## 🔧 Admin Panel
+##  Admin Panel
 
 Visit: **http://127.0.0.1:8000/admin/**
 Login with admin credentials to manage users, courses, and content.
